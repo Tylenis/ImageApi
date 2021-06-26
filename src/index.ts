@@ -2,7 +2,7 @@ import express from 'express';
 
 import { validateQuery } from './utilities/validators';
 import { imageResize } from './utilities/imageEditor';
-import { thumbsPath, makeImagesFilePath } from './utilities/imagePaths';
+import { thumbsPath, makeImagesFilePath } from './utilities/fileSystemUtility';
 
 const app = express();
 const port = 3000;

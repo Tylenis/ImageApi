@@ -1,9 +1,36 @@
+import path from 'path';
+import { promises as fs } from 'fs';
 import supertest from 'supertest';
+
 import app from '../index';
+import { imageResize } from '../utilities/imageEditor';
 
 const request = supertest(app);
 
 describe('Test endoints', () => {
+
+    const assetssPath = __dirname.split(path.sep).slice(0, -2).join(path.sep);
+    const thumbsPath = path.resolve(assetssPath, 'assets', 'thumb');
+    const testImagePath = path.resolve(
+        assetssPath,
+        'assets',
+        'images',
+        'fjord.jpg'
+    );
+    const testImageResized = path.resolve(thumbsPath, 'fjord_600_800.jpg');
+
+    beforeAll(async () => {
+        await imageResize(testImagePath, thumbsPath, 600, 800);
+    });
+
+    afterAll(async () => {
+        try {
+            await fs.rm(testImageResized);
+        } catch (error) {
+            console.log(' Test image was not removed');
+        }
+    });
+
     it('expect "/api/images?filename=fjord" respond with image/jpeg', async () => {
         const response = await request.get('/api/images?filename=fjord');
         expect(response.type).toBe('image/jpeg');

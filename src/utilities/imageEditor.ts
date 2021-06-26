@@ -1,17 +1,8 @@
 import sharp from 'sharp';
 import path from 'path';
-import { promises as fsPromises } from 'fs';
+import { checkIfExists, makeThumbFolder, thumbsPath } from './fileSystemUtility';
 
-/**Checks if the given image exists.*/
-const checkImageExists = async (filename: string): Promise<boolean> => {
-    try {
-        await fsPromises.access(filename);
-        return true;
-    } catch {
-        return false;
-    }
-};
-/**Resizes given image. Returns resized image path. If the image allready exists, doesn't resize, returns image path.*/
+
 const imageResize = async (
     filepath: string,
     destfolder: string,
@@ -23,7 +14,8 @@ const imageResize = async (
     const fulltPath = path.resolve(destfolder, filename);
 
     try {
-        const exists = await checkImageExists(fulltPath);
+        await makeThumbFolder(thumbsPath); 
+        const exists = await checkIfExists(fulltPath);
         if (exists) {
             return fulltPath;
         } else {
@@ -37,4 +29,4 @@ const imageResize = async (
     }
 };
 
-export { imageResize, checkImageExists };
+export { imageResize };

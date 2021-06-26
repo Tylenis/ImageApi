@@ -1,7 +1,10 @@
 import sharp from 'sharp';
 import path from 'path';
-import { checkIfExists, makeThumbFolder, thumbsPath } from './fileSystemUtility';
-
+import {
+    checkIfExists,
+    makeThumbFolder,
+    thumbsPath,
+} from './fileSystemUtility';
 
 const imageResize = async (
     filepath: string,
@@ -14,7 +17,7 @@ const imageResize = async (
     const fulltPath = path.resolve(destfolder, filename);
 
     try {
-        await makeThumbFolder(thumbsPath); 
+        await makeThumbFolder(thumbsPath);
         const exists = await checkIfExists(fulltPath);
         if (exists) {
             return fulltPath;

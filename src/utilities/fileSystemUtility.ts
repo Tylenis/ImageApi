@@ -32,18 +32,18 @@ const checkIfExists = async (path: string): Promise<boolean> => {
 };
 
 /**Creates thumb folder. */
-const makeThumbFolder =  async (path: string): Promise<boolean> => {
+const makeThumbFolder = async (path: string): Promise<boolean> => {
     const exist = await checkIfExists(path);
-    if(exist){
+    if (exist) {
         return true;
     } else {
         fsPromises.mkdir(path).catch((err) => {
-            console.log(err)
-            return false
-        })
+            console.log(err);
+            return false;
+        });
         return true;
     }
-} 
+};
 
 export {
     assetssPath,
@@ -52,5 +52,5 @@ export {
     makeImagesFilePath,
     makeThubnFilePath,
     checkIfExists,
-    makeThumbFolder
+    makeThumbFolder,
 };

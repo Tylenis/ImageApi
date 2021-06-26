@@ -1,12 +1,10 @@
 import path from 'path';
 import { promises as fs } from 'fs';
 
-
 import { imageResize } from '../utilities/imageEditor';
 import { checkIfExists } from '../utilities/fileSystemUtility';
 
 describe('Check checkImageExists function works as expected', () => {
-
     const assetssPath = __dirname.split(path.sep).slice(0, -2).join(path.sep);
     const thumbsPath = path.resolve(assetssPath, 'assets', 'thumb');
     const testImagePath = path.resolve(

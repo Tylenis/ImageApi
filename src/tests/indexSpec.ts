@@ -8,7 +8,6 @@ import { imageResize } from '../utilities/imageEditor';
 const request = supertest(app);
 
 describe('Test endoints', () => {
-
     const assetssPath = __dirname.split(path.sep).slice(0, -2).join(path.sep);
     const thumbsPath = path.resolve(assetssPath, 'assets', 'thumb');
     const testImagePath = path.resolve(

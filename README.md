@@ -20,7 +20,7 @@ To transpile code from Typescript to JavaScript run:
 npm run build
 ```
 
-It will create "build" folder. To start server, run:
+It will create "build" folder. To start server run:
 
 ```
 node ./build/index.js

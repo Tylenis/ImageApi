@@ -6,18 +6,25 @@ const imagesPath = path.resolve(assetssPath, 'assets', 'images');
 const thumbsPath = path.resolve(assetssPath, 'assets', 'thumb');
 
 /**Constructs image path. Returns path */
-const makeImagesFilePath = (filename: string): string => {
-    const filePath = path.resolve(imagesPath, `${filename}.jpg`);
+const makeImagesFilePath = (filename: string, ext = 'jpg'): string => {
+    const filePath = path.resolve(imagesPath, `${filename}.${ext}`);
     return filePath;
 };
 /**Constructs  thumb image path. Returns path */
 const makeThubnFilePath = (
     filename: string,
-    height: number,
-    width: number
+    height?: number,
+    width?: number
 ): string => {
-    const fullFileName = `${filename}_${height}_${width}`;
-    const filePath = path.resolve(thumbsPath, fullFileName);
+    let fullFileName: string;
+    let filePath: string;
+    if (height && width) {
+        fullFileName = `${filename}_${height}_${width}`;
+        filePath = path.resolve(thumbsPath, fullFileName);
+    } else {
+        filePath = path.resolve(thumbsPath, filename);
+    }
+
     return filePath;
 };
 

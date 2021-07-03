@@ -4,7 +4,7 @@ import { promises as fs } from 'fs';
 import { imageResize } from '../utilities/imageEditor';
 import { checkIfExists } from '../utilities/fileSystemUtility';
 
-describe('Check checkImageExists function works as expected', () => {
+describe('Check checkImageExists function works as expected.', () => {
     const assetssPath = __dirname.split(path.sep).slice(0, -2).join(path.sep);
     const thumbsPath = path.resolve(assetssPath, 'assets', 'thumb');
     const testImagePath = path.resolve(
@@ -27,12 +27,12 @@ describe('Check checkImageExists function works as expected', () => {
         }
     });
 
-    it('expect checkImageExists function returns true if image exists', async () => {
+    it('expect checkImageExists function  to return true if image exist.', async () => {
         const checkIfExist = await checkIfExists(testImageResized);
         expect(checkIfExist).toBeTrue();
     });
 
-    it('expect checkImageExists function returns false if image exists or path is invalid', async () => {
+    it('expect checkImageExists function to return false if image does not exist.', async () => {
         const checkIfExist = await checkIfExists('random string');
         expect(checkIfExist).toBeFalse();
     });

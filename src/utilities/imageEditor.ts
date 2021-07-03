@@ -3,33 +3,66 @@ import path from 'path';
 import {
     checkIfExists,
     makeThumbFolder,
+    makeThubnFilePath,
+    makeImagesFilePath,
     thumbsPath,
 } from './fileSystemUtility';
 
+/** Resizes and  changes image file format. Returns image */
 const imageResize = async (
     filepath: string,
     destfolder: string,
     height: number,
-    width: number
+    width: number,
+    outputtype = 'jpg'
 ): Promise<string> => {
-    const filename =
-        path.basename(filepath, '.jpg') + '_' + height + '_' + width + '.jpg';
-    const fulltPath = path.resolve(destfolder, filename);
+    const outpuFileType = '.' + outputtype;
+    const filenameWithoutExt = filepath.split('.')[0];
+    const outputFilename =
+        path.basename(filenameWithoutExt) +
+        '_' +
+        height +
+        '_' +
+        width +
+        outpuFileType;
+    const outputFilePath = path.resolve(destfolder, outputFilename);
 
     try {
         await makeThumbFolder(thumbsPath);
-        const exists = await checkIfExists(fulltPath);
+        const exists = await checkIfExists(outputFilePath);
         if (exists) {
-            return fulltPath;
+            return outputFilePath;
         } else {
             await sharp(filepath)
                 .resize({ height: height, width: width })
-                .toFile(fulltPath);
-            return fulltPath;
+                .toFile(outputFilePath);
+            return outputFilePath;
         }
     } catch (error) {
         return 'No image!';
     }
 };
 
-export { imageResize };
+/** Changes image file type. Currently changes to png, webp */
+const changeImageType = async (
+    image: string,
+    outtype: string
+): Promise<string> => {
+    const inputFilePath = makeImagesFilePath(image);
+    const exist = await checkIfExists(inputFilePath);
+    if (outtype == 'jpg' && exist) {
+        return inputFilePath;
+    }
+    const outpuFileType = '.' + outtype;
+    const outputFilePath = makeThubnFilePath(image) + outpuFileType;
+    const exists = await checkIfExists(outputFilePath);
+    if (exists) {
+        return outputFilePath;
+    } else {
+        await makeThumbFolder(thumbsPath);
+        await sharp(inputFilePath).toFile(outputFilePath);
+        return outputFilePath;
+    }
+};
+
+export { imageResize, changeImageType };

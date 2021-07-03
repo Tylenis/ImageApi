@@ -1,4 +1,4 @@
-1# Image Processing API
+# Image Processing API
 
 This API allows to place images into frontend with the size and image format (jpg, png, webp) set via URL parameters. The second use case is as a library to serve properly scaled versions of images to the front end to reduce page load size.
 

@@ -42,7 +42,7 @@ Example:
 http://localhost:3000/api/images?filename=fjord
 ```
 Get resized image by typing url with additional "height" and "width" query parameters. Both "height" and "width" paramameters are required to resize image.
-Server will respond with  an unmodified image in case one of them is missing;
+Server will respond with  an error message if one of them is missing or isn't a valid number;
  
 ```
 http://localhost:3000/api/images?filename={imagename}&height={number}&width={number}

@@ -1,9 +1,9 @@
 import path from 'path';
 import { promises as fs } from 'fs';
 
-import { imageResize, changeImageType } from '../utilities/imageEditor';
+import { editImage } from '../utilities/imageEditor';
 
-describe('Check imageEditor.ts module works as expected.', () => {
+describe('Check imageEditor.ts module works as expected.', (): void => {
     const assetssPath = __dirname.split(path.sep).slice(0, -2).join(path.sep);
     const thumbsPath = path.resolve(assetssPath, 'assets', 'thumb');
     const testImagePath = path.resolve(
@@ -12,28 +12,23 @@ describe('Check imageEditor.ts module works as expected.', () => {
         'images',
         'fjord.jpg'
     );
-    const testImage = 'fjord';
     const testImageResizedJPG = path.resolve(thumbsPath, 'fjord_600_800.jpg');
     const testImageResizedPNG = path.resolve(thumbsPath, 'fjord_600_800.png');
-    const testImageConverted = path.resolve(thumbsPath, 'fjord_600_800.png');
 
-    beforeAll(async () => {
-        try {
-            await fs.rm(testImageResizedJPG);
-        } catch (error) {
-            return false;
-        }
-    });
+    describe('Check editImage function works as expected.', (): void => {
+        it('expect editImage function  to return path of unmodified image.', async (): Promise<void> => {
+            const path = await editImage(testImagePath, thumbsPath, NaN, NaN);
+            expect(path).toBe(testImagePath);
+        });
 
-    describe('Check imageResize function works as expected.', () => {
-        it('expect imageResize function  to resize image and return its path.', async () => {
-            const path = await imageResize(testImagePath, thumbsPath, 600, 800);
+        it('expect editImage function  to resize image and return its path.', async (): Promise<void> => {
+            const path = await editImage(testImagePath, thumbsPath, 600, 800);
             const result = await fs.access(path);
             expect(result).toBe(undefined);
         });
 
-        it('expect imageResize function  to resize, convert image to "png" format and return its path.', async () => {
-            const path = await imageResize(
+        it('expect editImage function  to resize, convert image to "png" format and return its path.', async (): Promise<void> => {
+            const path = await editImage(
                 testImagePath,
                 thumbsPath,
                 600,
@@ -44,52 +39,58 @@ describe('Check imageEditor.ts module works as expected.', () => {
             expect(result).toBe(undefined);
         });
 
-        it('expect imageResize function to return allready existing image path without resizing.', async () => {
-            const statOld = await fs.stat(testImageResizedJPG);
-            const path = await imageResize(testImagePath, thumbsPath, 600, 800);
-            const statNew = await fs.stat(path);
-            expect(statOld.birthtime).toEqual(statNew.birthtime);
-        });
-
-        it('expect imageResize function with invalid filepath to return "No image!"', async () => {
-            const result = await imageResize('aaaaaa', thumbsPath, 600, 800);
-            expect(result).toEqual('No image!');
-        });
-    });
-    describe('Check changeImageType function works as expected.', () => {
-        it('expect changeImageType  function to return image path if the image allready exist and output format is "jpg".', async () => {
-            const path = await changeImageType(testImage, 'jpg');
-            const result = await fs.access(path);
-            expect(result).toBe(undefined);
-        });
-        it('expect changeImageType function  to convert to "png" format and return image path.', async () => {
-            const path = await changeImageType(testImage, 'png');
-            const result = await fs.access(path);
-            expect(result).toBe(undefined);
-        });
-        it('expect changeImageType function  to return allready existing "png" image path without converting.', async () => {
-            const pathOld = await changeImageType(testImage, 'png');
+        it('expect editImage function to return allready existing image path without resizing.', async (): Promise<void> => {
+            const pathOld = await editImage(
+                testImagePath,
+                thumbsPath,
+                600,
+                800
+            );
             const statOld = await fs.stat(pathOld);
-            const pathNew = await changeImageType(testImage, 'png');
+            const pathNew = await editImage(
+                testImagePath,
+                thumbsPath,
+                600,
+                800
+            );
             const statNew = await fs.stat(pathNew);
             expect(statOld.birthtime).toEqual(statNew.birthtime);
         });
-    });
-    afterAll(async () => {
-        try {
-            await fs.rm(testImageResizedJPG);
-        } catch (error) {
-            console.log('Resized JPG image does not exist');
-        }
-        try {
-            await fs.rm(testImageResizedPNG);
-        } catch (error) {
-            console.log('Resized PNG image does not exist');
-        }
-        try {
-            await fs.rm(testImageConverted);
-        } catch (error) {
-            console.log('PNG image does not exist');
-        }
+
+        it('expect editImage function with  size parameters and invalid filename to return "Resizing error. Most likely your filename is incorrect."', async (): Promise<void> => {
+            const result = await editImage('aaaaaa', thumbsPath, 600, 800);
+            expect(result).toEqual(
+                'Resizing error. Most likely your filename is incorrect.'
+            );
+        });
+        it('expect editImage function with  with format parameter  and invalid filename to return "Image format converting error. Most likely your filename is incorrect."', async (): Promise<void> => {
+            const result = await editImage(
+                'aaaaaa',
+                thumbsPath,
+                NaN,
+                NaN,
+                'png'
+            );
+            expect(result).toEqual(
+                'Image format converting error. Most likely your filename is incorrect.'
+            );
+        });
+        it('expect editImage function with  without format, size parameters  and with invalid filename to return "Image does not exist"', async (): Promise<void> => {
+            const result = await editImage('aaaaaa', thumbsPath, NaN, NaN);
+            expect(result).toEqual('Image does not exist');
+        });
+
+        afterAll(async (): Promise<void> => {
+            try {
+                await fs.rm(testImageResizedJPG);
+            } catch (error) {
+                console.log('Resized JPG image not found.');
+            }
+            try {
+                await fs.rm(testImageResizedPNG);
+            } catch (error) {
+                console.log('Resized PNG image not found.');
+            }
+        });
     });
 });

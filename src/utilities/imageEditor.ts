@@ -3,66 +3,60 @@ import path from 'path';
 import {
     checkIfExists,
     makeThumbFolder,
-    makeThubnFilePath,
-    makeImagesFilePath,
     thumbsPath,
 } from './fileSystemUtility';
 
-/** Resizes and  changes image file format. Returns image */
-const imageResize = async (
+/** Resizes and  changes image file format. Returns image path or error message */
+const editImage = async (
     filepath: string,
     destfolder: string,
     height: number,
     width: number,
-    outputtype = 'jpg'
+    format = 'jpg'
 ): Promise<string> => {
-    const outpuFileType = '.' + outputtype;
-    const filenameWithoutExt = filepath.split('.')[0];
-    const outputFilename =
-        path.basename(filenameWithoutExt) +
-        '_' +
-        height +
-        '_' +
-        width +
-        outpuFileType;
-    const outputFilePath = path.resolve(destfolder, outputFilename);
-
-    try {
+    const thumbFolderExist = await checkIfExists(thumbsPath);
+    if (!thumbFolderExist) {
         await makeThumbFolder(thumbsPath);
-        const exists = await checkIfExists(outputFilePath);
-        if (exists) {
-            return outputFilePath;
+    }
+    const filenameWithoutExt = filepath.split('.')[0];
+    const basename = path.basename(filenameWithoutExt);
+    if (height && width) {
+        const outputFilename = `${basename}_${height}_${width}.${format}`;
+        const outputFilePath = path.resolve(destfolder, outputFilename);
+        const imageExist = await checkIfExists(outputFilePath);
+        if (!imageExist) {
+            try {
+                await sharp(filepath)
+                    .resize({ height: height, width: width })
+                    .toFile(outputFilePath);
+                return outputFilePath;
+            } catch (error) {
+                return 'Resizing error. Most likely your filename is incorrect.';
+            }
         } else {
-            await sharp(filepath)
-                .resize({ height: height, width: width })
-                .toFile(outputFilePath);
             return outputFilePath;
         }
-    } catch (error) {
-        return 'No image!';
+    } else if (!height && !width && format !== 'jpg') {
+        const outputFilename = `${basename}.${format}`;
+        const outputFilePath = path.resolve(destfolder, outputFilename);
+        const imageExist = await checkIfExists(outputFilePath);
+        if (!imageExist) {
+            try {
+                await sharp(filepath).toFile(outputFilePath);
+                return outputFilePath;
+            } catch (error) {
+                return 'Image format converting error. Most likely your filename is incorrect.';
+            }
+        } else {
+            return outputFilePath;
+        }
     }
-};
-
-/** Changes image file type. Currently changes to png, webp */
-const changeImageType = async (
-    image: string,
-    outtype: string
-): Promise<string> => {
-    const inputFilePath = makeImagesFilePath(image);
-    const exist = await checkIfExists(inputFilePath);
-    if (outtype == 'jpg' && exist) {
-        return inputFilePath;
-    }
-    const outpuFileType = '.' + outtype;
-    const outputFilePath = makeThubnFilePath(image) + outpuFileType;
-    const exists = await checkIfExists(outputFilePath);
-    if (exists) {
-        return outputFilePath;
+    const imageExist = await checkIfExists(filepath);
+    if (imageExist) {
+        return filepath;
     } else {
-        await makeThumbFolder(thumbsPath);
-        await sharp(inputFilePath).toFile(outputFilePath);
-        return outputFilePath;
+        return 'Image does not exist';
     }
 };
 
-export { imageResize, changeImageType };
+export { editImage };
